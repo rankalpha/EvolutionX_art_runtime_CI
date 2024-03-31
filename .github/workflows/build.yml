@@ -90,7 +90,16 @@ jobs:
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags art
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build_soong
-
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/go/linux-x86
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/golang-protobuf
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/build-tools
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v29
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v30
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v31
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v32
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v33
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
+          
       - name: "🎶 setup android environment"
         working-directory: ./${{ env.workerDir }}
         run: |
