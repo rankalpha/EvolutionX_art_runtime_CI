@@ -156,7 +156,7 @@ jobs:
         working-directory: ./${{ env.workerDir }}
         run: |
           source build/envsetup.sh
-          lunch lineage_lavender-userdebug
+          lunch evolution_lavender-userdebug
           mmm art:runtime
           
       - name: "💛 Upload libart.so"
