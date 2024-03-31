@@ -117,7 +117,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install curl
           #curl https://udomain.dl.sourceforge.net/project/evolution-x/lavender/14/evolution_lavender-ota-uq1a.240205.004-02061250-OFFICIAL.zip -o lavender.zip
-          curl https://sourceforge.net/projects/evolution-x/files/lavender/14/evolution_lavender-ota-uq1a.240205.004-02061250-OFFICIAL.zip/download -o lavender.zip
+          #curl https://sourceforge.net/projects/evolution-x/files/lavender/14/evolution_lavender-ota-uq1a.240205.004-02061250-OFFICIAL.zip/download -o lavender.zip
+          curl https://cfhcable.dl.sourceforge.net/project/evolution-x/lavender/14/evolution_lavender-ota-uq1a.240205.004-02061250-OFFICIAL.zip -o lavender.zip
 
       - name: "✨ unzip zipfile and mount image"
         run: |
