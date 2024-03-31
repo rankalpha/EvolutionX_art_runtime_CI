@@ -99,6 +99,10 @@ jobs:
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v32
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v33
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags packages_modules_adb
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags system_core
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/tools/asuite
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/bazel/common
           
       - name: "🎶 setup android environment"
         working-directory: ./${{ env.workerDir }}
