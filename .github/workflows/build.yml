@@ -57,46 +57,39 @@ jobs:
       - name: "🌟 init git android branch source"
         working-directory: ./${{ env.workerDir }}
         run: |
-          ~/bin/repo init -u https://github.com/Evolution-X/manifest.git -b $branch --git-lfs --depth=1
+          ~/bin/repo init -u $kernelRepo -b $branch --git-lfs --depth=1
 
       - name: "🌟 create local manifest file"
         working-directory: ./${{ env.workerDir }}
         run: |
           mkdir -p .repo/local_manifests
-          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >> .repo/local_manifests/roomservice.xml
           echo "<manifest>" >> .repo/local_manifests/roomservice.xml
-          echo "  <project path=\"device/xiaomi/lavender\" remote=\"github\" name=\"LineageOS/android_device_xiaomi_lavender\" />" >> .repo/local_manifests/roomservice.xml
-          echo "  <project path=\"device/xiaomi/sdm660-common\" remote=\"github\" name=\"LineageOS/android_device_xiaomi_sdm660-common\" />" >> .repo/local_manifests/roomservice.xml
-          echo "  <project path=\"hardware/xiaomi\" remote=\"github\" name=\"LineageOS/android_hardware_xiaomi\" />" >> .repo/local_manifests/roomservice.xml
-          echo "  <project path=\"kernel/xiaomi/sdm660\" remote=\"github\" name=\"LineageOS/android_kernel_xiaomi_sdm660\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <remote  name=\"evo-coptan99\"" >> .repo/local_manifests/roomservice.xml
+          echo "           fetch=\"https://github.com/Coptan99\"" >> .repo/local_manifests/roomservice.xml
+          echo "           revision=\"refs/heads/udc\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"device/xiaomi/lavender\" remote=\"evo-devices\" name=\"device_xiaomi_lavender\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"device/xiaomi/sdm660-common\" remote=\"evo-devices\" name=\"device_xiaomi_sdm660-common\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"vendor/xiaomi/lavender\" remote=\"evo-devices\" name=\"vendor_xiaomi_lavender\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"vendor/xiaomi/sdm660-common\" remote=\"evo-devices\" name=\"vendor_xiaomi_sdm660-common\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"kernel/xiaomi/sdm660\" remote=\"evo-coptan99\" name=\"android_kernel_xiaomi_sdm660\" />" >> .repo/local_manifests/roomservice.xml
           echo "</manifest>" >> .repo/local_manifests/roomservice.xml
-          #cat .repo/local_manifests/roomservice.xml
 
       - name: "🎶 repo sync lavender module"
         working-directory: ./${{ env.workerDir }}
         run: |
           #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_device_xiaomi_lavender
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_device_xiaomi_sdm660-common
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_hardware_xiaomi
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_kernel_xiaomi_sdm660  
-
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags device_xiaomi_lavender
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags device_xiaomi_sdm660-common
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags vendor_xiaomi_lavender
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags vendor_xiaomi_sdm660-common  
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags android_kernel_xiaomi_sdm660
+          
       - name: "🌟 Clone android branch source"
         working-directory: ./${{ env.workerDir }}
         run: |
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_art
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_vendor_lineage
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build_soong
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build_blueprint
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/go/linux-x86
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags external/golang-protobuf
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_prebuilts_build-tools
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_vendor_lineage
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v27
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v28
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v29
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags art
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build_soong
 
       - name: "🎶 setup android environment"
         working-directory: ./${{ env.workerDir }}
@@ -109,7 +102,7 @@ jobs:
           cd ~/android
           sudo apt-get update
           sudo apt-get install curl
-          curl https://b2.timschumi.net/file/lineage-archive/lineage-18.1-20220920-nightly-lavender-signed.zip -o lavender.zip
+          curl https://udomain.dl.sourceforge.net/project/evolution-x/lavender/14/evolution_lavender-ota-uq1a.240205.004-02061250-OFFICIAL.zip -o lavender.zip
 
       - name: "✨ unzip zipfile and mount image"
         run: |
@@ -147,8 +140,7 @@ jobs:
         working-directory: ./${{ env.workerDir }}
         run: |
           source build/envsetup.sh
-          #lunch lineage_lavender-userdebug
-          breakfast lavender
+          lunch lineage_lavender-userdebug
           mmm art:runtime
           
       - name: "💛 Upload libart.so"
