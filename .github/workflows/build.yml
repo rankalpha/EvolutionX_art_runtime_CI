@@ -108,11 +108,7 @@ jobs:
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/tools/asuite
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/bazel/common
-          
-      - name: "🎶 setup android environment"
-        working-directory: ./${{ env.workerDir }}
-        run: |
-          source ./build/envsetup.sh
+
 
       - name: "✨ download zip"
         run: |
