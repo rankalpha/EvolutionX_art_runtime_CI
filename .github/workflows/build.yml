@@ -125,12 +125,12 @@ jobs:
           cd ~/android/system_dump/
           unzip ../lavender.zip system.transfer.list system.new.dat*
           unzip ../lavender.zip vendor.transfer.list vendor.new.dat*
-          sudo apt-get install brotli
-          brotli --decompress --output=system.new.dat.dec system.new.dat
-          brotli --decompress --output=vendor.new.dat.dec vendor.new.dat
+          #sudo apt-get install brotli
+          #brotli --decompress --output=system.new.dat.dec system.new.dat
+          #brotli --decompress --output=vendor.new.dat.dec vendor.new.dat
           git clone https://github.com/xpirt/sdat2img
-          python sdat2img/sdat2img.py system.transfer.list system.new.dat.dec system.img
-          python sdat2img/sdat2img.py vendor.transfer.list vendor.new.dat.dec vendor.img
+          python sdat2img/sdat2img.py system.transfer.list system.new.dat system.img
+          python sdat2img/sdat2img.py vendor.transfer.list vendor.new.dat vendor.img
           sudo mkdir system/
           sudo mount system.img system/
           sudo rm -rf system/vendor
