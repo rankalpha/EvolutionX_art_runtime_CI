@@ -87,12 +87,12 @@ jobs:
       - name: "🌟 Clone android branch source"
         working-directory: ./${{ env.workerDir }}
         run: |
-          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/art
+          #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/art
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/build
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/build/soong
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/system/core
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/packages/modules/adb
-          #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags art
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags art
           #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build
           #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags build_soong
           #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags system_core
