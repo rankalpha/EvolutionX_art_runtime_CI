@@ -108,7 +108,8 @@ jobs:
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/tools/asuite
           ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/bazel/common
-
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags android_tools_extract-utils
+          
       - name: "✨ download zip"
         run: |
           mkdir ~/android
