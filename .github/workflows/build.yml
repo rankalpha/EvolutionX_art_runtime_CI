@@ -1,0 +1,160 @@
+name: "Build EvolutionX libart library"
+
+env:
+  CONFIGURATION: "repos.json"
+  OUT_DIR: "out"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Set-repos:
+    name: "🐂 Parse repos.json"
+    runs-on: ubuntu-latest
+    outputs:
+      repos: ${{ steps.generate-matrix.outputs.repos }}
+    steps:
+      - name: "😄 Checkout"
+        uses: actions/checkout@v3
+
+      - name: "😆 Generate Matrix"
+        id: generate-matrix
+        run: |
+          echo "repos<<EOF" >> $GITHUB_OUTPUT
+          cat  ${{ env.CONFIGURATION }} >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  Build-EvolutionX-libart:
+    name: "🐎 Build EvolutionX libart"
+    runs-on: ubuntu-latest
+    needs:
+      - Set-repos
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        repos: ${{ fromJSON(needs.Set-repos.outputs.repos) }}
+    env:
+      workerDir: ${{ matrix.repos.androidSource.workerDir }}
+      kernelName: ${{ matrix.repos.androidSource.name }}
+      kernelRepo: ${{ matrix.repos.androidSource.repo }}
+      branch: ${{ matrix.repos.androidSource.branch }}
+      kernelDevice: ${{ matrix.repos.androidSource.device }}
+      
+    steps:
+      - name: "✨ Create working dir"
+        run: mkdir -p $workerDir
+
+      - name: "⭐ config env and download repo"
+        run: |
+          git config --global user.email "rankalpha@yandex.com"
+          git config --global user.name "rankalpha"
+          mkdir ~/bin
+          PATH=~/bin:$PATH
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          
+      - name: "🌟 init git android branch source"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          ~/bin/repo init -u https://github.com/Evolution-X/manifest.git -b $branch --git-lfs --depth=1
+
+      - name: "🌟 create local manifest file"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          mkdir -p .repo/local_manifests
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >> .repo/local_manifests/roomservice.xml
+          echo "<manifest>" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"device/xiaomi/lavender\" remote=\"github\" name=\"LineageOS/android_device_xiaomi_lavender\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"device/xiaomi/sdm660-common\" remote=\"github\" name=\"LineageOS/android_device_xiaomi_sdm660-common\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"hardware/xiaomi\" remote=\"github\" name=\"LineageOS/android_hardware_xiaomi\" />" >> .repo/local_manifests/roomservice.xml
+          echo "  <project path=\"kernel/xiaomi/sdm660\" remote=\"github\" name=\"LineageOS/android_kernel_xiaomi_sdm660\" />" >> .repo/local_manifests/roomservice.xml
+          echo "</manifest>" >> .repo/local_manifests/roomservice.xml
+          #cat .repo/local_manifests/roomservice.xml
+
+      - name: "🎶 repo sync lavender module"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          #~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_device_xiaomi_lavender
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_device_xiaomi_sdm660-common
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_hardware_xiaomi
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_kernel_xiaomi_sdm660  
+
+      - name: "🌟 Clone android branch source"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_art
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_vendor_lineage
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build_soong
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_build_blueprint
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/go/linux-x86
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags external/golang-protobuf
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_prebuilts_build-tools
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags LineageOS/android_vendor_lineage
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v27
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v28
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/prebuilts/vndk/v29
+          ~/bin/repo sync -c -j8 --force-sync --no-clone-bundle --no-tags platform/external/okhttp
+
+      - name: "🎶 setup android environment"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          source ./build/envsetup.sh
+
+      - name: "✨ download zip"
+        run: |
+          mkdir ~/android
+          cd ~/android
+          sudo apt-get update
+          sudo apt-get install curl
+          curl https://b2.timschumi.net/file/lineage-archive/lineage-18.1-20220920-nightly-lavender-signed.zip -o lavender.zip
+
+      - name: "✨ unzip zipfile and mount image"
+        run: |
+          mkdir ~/android/system_dump/
+          cd ~/android/system_dump/
+          unzip ../lavender.zip system.transfer.list system.new.dat*
+          unzip ../lavender.zip vendor.transfer.list vendor.new.dat*
+          sudo apt-get install brotli
+          brotli --decompress --output=system.new.dat system.new.dat.br
+          brotli --decompress --output=vendor.new.dat vendor.new.dat.br
+          git clone https://github.com/xpirt/sdat2img
+          python sdat2img/sdat2img.py system.transfer.list system.new.dat system.img
+          python sdat2img/sdat2img.py vendor.transfer.list vendor.new.dat vendor.img
+          sudo mkdir system/
+          sudo mount system.img system/
+          sudo rm -rf system/vendor
+          sudo mkdir system/vendor
+          sudo mount vendor.img system/vendor/
+
+      - name: "🎶 extract vendor"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          cd device/xiaomi/lavender
+          ./extract-files.sh ~/android/system_dump/
+          sudo umount ~/android/system_dump/system/vendor
+          sudo umount ~/android/system_dump/system
+          rm -rf ~/android/system_dump/
+          
+      - name: "⭐ Install prerequisites"
+        run: |
+          sudo apt-get update
+          sudo apt-get install gnupg flex bison gperf libsdl1.2-dev squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev openjdk-8-jre openjdk-8-jdk pngcrush schedtool libxml2 libxml2-utils xsltproc lzop libc6-dev schedtool g++-multilib lib32z1-dev gcc-multilib maven tmux screen w3m ncftp libncurses5-dev
+                               
+      - name: "🎶 Build android"
+        working-directory: ./${{ env.workerDir }}
+        run: |
+          source build/envsetup.sh
+          #lunch lineage_lavender-userdebug
+          breakfast lavender
+          mmm art:runtime
+          
+      - name: "💛 Upload libart.so"
+        uses: actions/upload-artifact@v3
+        with:
+          name: libart.so
+          path: ./${{ env.kernelDir }}/${{ env.OUT_DIR }}/arch/${{ env.ARCH }}/boot
+          if-no-files-found: ignore
+          retention-days: 7
